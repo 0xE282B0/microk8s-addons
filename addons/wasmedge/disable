@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Disabling crun with wasmedge support"
+sudo rm $SNAP_DATA/var/lock/kata.enabled
+
+echo "Switching OCI runtime back to default"
+cp $SNAP/microk8s-resources/default-args/containerd-template.toml $SNAP_DATA/args/containerd-template.toml
+sudo systemctl restart snap.microk8s.daemon-containerd
+
+echo "Disabled crun with wasmedge support"
