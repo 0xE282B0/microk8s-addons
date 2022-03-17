@@ -1,0 +1,39 @@
+From ee3d95925242b6d7de9a058ccb9414827b9d138e Mon Sep 17 00:00:00 2001
+From: Sven Pfennig <s.pfennig@reply.de>
+Date: Wed, 16 Mar 2022 10:02:24 +0100
+Subject: [PATCH 1/1] add crun to containerd-template.toml
+
+Signed-off-by: Sven Pfennig <s.pfennig@reply.de>
+---
+ microk8s-resources/default-args/containerd-template.toml | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/microk8s-resources/default-args/containerd-template.toml b/microk8s-resources/default-args/containerd-template.toml
+index a5a73e8..7e28fac 100644
+--- a/microk8s-resources/default-args/containerd-template.toml
++++ b/microk8s-resources/default-args/containerd-template.toml
+@@ -43,7 +43,7 @@ oom_score = 0
+     no_pivot = false
+ 
+     # default_runtime_name is the default runtime name to use.
+-    default_runtime_name = "${RUNTIME}"
++    default_runtime_name = "crun"
+ 
+     # 'plugins."io.containerd.grpc.v1.cri".containerd.runtimes' is a map from CRI RuntimeHandler strings, which specify types
+     # of runtime configurations, to the matching configurations.
+@@ -64,6 +64,12 @@ oom_score = 0
+       [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata.options]
+         BinaryName = "kata-runtime"
+ 
++   [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.crun]
++      runtime_type = "${RUNTIME_TYPE}"
++      pod_annotations = ["*.wasm.*", "wasm.*", "module.wasm.image/*", "*.module.wasm.image", "module.wasm.image/variant.*", "run.oci.handler"]
++      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.crun.options]
++        BinaryName = "crun"
++
+   # 'plugins."io.containerd.grpc.v1.cri".cni' contains config related to cni
+   [plugins."io.containerd.grpc.v1.cri".cni]
+     # bin_dir is the directory in which the binaries for the plugin is kept.
+-- 
+2.32.0 (Apple Git-132)
+
