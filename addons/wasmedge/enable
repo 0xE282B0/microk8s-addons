@@ -1,17 +1,18 @@
 #!/bin/bash
 
-SNAP_CHANNEL=--candidate
+source "$SNAP/actions/common/utils.sh"
+
+SNAP_CHANNEL="--edge --devmode"
 PATCH_DIR=`dirname "$0"`/patch
 
 echo "Enabling wasmedge via crun OCI runtime"
 
 echo "Install/Upgrade crun-wasmedge from snapstore"
-[ ! -d "/snap/crun-wasmedge/current" ] && sudo snap install $SNAP_CHANNEL crun-wasmedge || sudo snap refresh $SNAP_CHANNEL crun-wasmedge
-sudo ln -sf /snap/crun-wasmedge/current/crun.wrapper /usr/local/bin/crun
+[ ! -d "/snap/crun-wasmedge/current" ] && run_with_sudo snap install $SNAP_CHANNEL crun-wasmedge || run_with_sudo snap refresh $SNAP_CHANNEL crun-wasmedge
 
 echo "Switching OCI runtime to crun with wasmedge support"
-sudo patch -p1 $SNAP_DATA/args/containerd-template.toml $PATCH_DIR/0001-add-crun-to-containerd-template.toml.patch 
-sudo systemctl restart snap.microk8s.daemon-containerd
+run_with_sudo sed -i -f $PATCH_DIR/enable_crun_containerd-template.toml.sed $SNAP_DATA/args/containerd-template.toml
+run_with_sudo systemctl restart snap.microk8s.daemon-containerd
 
-sudo touch $SNAP_DATA/var/lock/wasmedge.enabled
+run_with_sudo touch $SNAP_DATA/var/lock/wasmedge.enabled
 echo "Enabled wasmedge via crun OCI runtime"
